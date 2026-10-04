@@ -1,12 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using UsedBookExchange.Domain.Entities;
+using UsedBookExchange.Infrastructure.Identity;
 
-namespace UsedBookExchange.Infrastructure.Data
+namespace UsedBookExchange.Infrastructure.Data;
+
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 {
-	internal class ApplicationDbContext
+	public ApplicationDbContext(
+		DbContextOptions<ApplicationDbContext> options)
+		: base(options)
 	{
+	}
+
+	public DbSet<Book> Books => Set<Book>();
+
+	public DbSet<BookRequest> BookRequests => Set<BookRequest>();
+
+	protected override void OnModelCreating(ModelBuilder builder)
+	{
+		base.OnModelCreating(builder);
+
+		builder.ApplyConfigurationsFromAssembly(
+			typeof(ApplicationDbContext).Assembly);
 	}
 }

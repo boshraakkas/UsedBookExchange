@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace UsedBookExchange.Domain.Enums;
 
-namespace UsedBookExchange.Domain.Enums
+public enum RequestStatus
 {
-	internal class RequestStatus
-	{
-	}
+	Pending,
+	Accepted,
+	Rejected,
+	Completed
 }
