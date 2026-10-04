@@ -1,0 +1,94 @@
+﻿@model UsedBookExchange.Domain.Entities.Book
+
+@{
+    ViewData["Title"] = "Book Details";
+}
+
+<div class="container mt-4">
+
+    <div class="row">
+
+        <div class="col-md-5">
+
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <img src="@Model.ImageUrl"
+                     alt="@Model.Title"
+                     class="img-fluid rounded shadow-sm"
+                     style="max-height: 500px; width: 100%; object-fit: cover;" />
+            }
+            else
+            {
+                <div class="bg-light border rounded d-flex align-items-center justify-content-center"
+                     style="height: 400px;">
+                    <span class="text-muted">No image available</span>
+                </div>
+            }
+
+        </div>
+
+        <div class="col-md-7">
+
+            <h1 class="mb-3">@Model.Title</h1>
+
+            <p>
+                <strong>Author:</strong>
+                @Model.Author
+            </p>
+
+            <p>
+                <strong>Category:</strong>
+                @Model.Category
+            </p>
+
+            <p>
+                <strong>Condition:</strong>
+                @Model.Condition
+            </p>
+
+            <p>
+                <strong>Status:</strong>
+                @Model.Status
+            </p>
+
+            <hr />
+
+            <h5>Description</h5>
+
+            <p>
+                @if (string.IsNullOrWhiteSpace(Model.Description))
+                {
+                    <span class="text-muted">
+                        No description provided.
+                    </span>
+                }
+                else
+                {
+                    @Model.Description
+                }
+            </p>
+
+            <div class="mt-4">
+
+                <a asp-action="Index"
+                   class="btn btn-secondary">
+                    Back to Books
+                </a>
+
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <a asp-controller="Requests"
+                       asp-action="Create"
+                       asp-route-bookId="@Model.Id"
+                       class="btn btn-success">
+                        Request This Book
+                    </a>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

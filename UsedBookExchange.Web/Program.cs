@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using UsedBookExchange.Infrastructure.Data;
 using UsedBookExchange.Infrastructure.Identity;
+using UsedBookExchange.Infrastructure.Repositories;
+using UsedBookExchange.Infrastructure.Repositories.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +28,10 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
+
+// Repositories
+builder.Services.AddScoped<IBookRepository, BookRepository>();
+builder.Services.AddScoped<IBookRequestRepository, BookRequestRepository>();
 
 // MVC
 builder.Services.AddControllersWithViews();

@@ -1,0 +1,131 @@
+﻿@model UsedBookExchange.Web.ViewModels.BookCreateViewModel
+
+@{
+    ViewData["Title"] = "Add Book";
+}
+
+<div class="container mt-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-8">
+
+            <h1 class="mb-4">Add a Book</h1>
+
+            <form asp-action="Create" method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3">
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Title"
+                           class="form-label">
+                    </label>
+
+                    <input asp-for="Title"
+                           class="form-control" />
+
+                    <span asp-validation-for="Title"
+                          class="text-danger">
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Author"
+                           class="form-label">
+                    </label>
+
+                    <input asp-for="Author"
+                           class="form-control" />
+
+                    <span asp-validation-for="Author"
+                          class="text-danger">
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Category"
+                           class="form-label">
+                    </label>
+
+                    <input asp-for="Category"
+                           class="form-control" />
+
+                    <span asp-validation-for="Category"
+                          class="text-danger">
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Condition"
+                           class="form-label">
+                    </label>
+
+                    <select asp-for="Condition"
+                            class="form-select"
+                            asp-items="Html.GetEnumSelectList<UsedBookExchange.Domain.Enums.BookCondition>()">
+                        <option value="">Select condition</option>
+                    </select>
+
+                    <span asp-validation-for="Condition"
+                          class="text-danger">
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description"
+                           class="form-label">
+                    </label>
+
+                    <textarea asp-for="Description"
+                              class="form-control"
+                              rows="5">
+                    </textarea>
+
+                    <span asp-validation-for="Description"
+                          class="text-danger">
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ImageUrl"
+                           class="form-label">
+                    </label>
+
+                    <input asp-for="ImageUrl"
+                           class="form-control"
+                           placeholder="https://example.com/book.jpg" />
+
+                    <span asp-validation-for="ImageUrl"
+                          class="text-danger">
+                    </span>
+                </div>
+
+                <div class="mt-4">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Add Book
+                    </button>
+
+                    <a asp-action="Index"
+                       class="btn btn-secondary ms-2">
+                        Cancel
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

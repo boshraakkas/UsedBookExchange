@@ -1,12 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using UsedBookExchange.Domain.Entities;
 
-namespace UsedBookExchange.Infrastructure.Repositories.Interfaces
+namespace UsedBookExchange.Infrastructure.Repositories.Interfaces;
+
+public interface IBookRequestRepository
 {
-	internal class IBookRequestRepository
-	{
-	}
+	Task<IEnumerable<BookRequest>> GetAllAsync();
+
+	Task<BookRequest?> GetByIdAsync(int id);
+
+	Task<IEnumerable<BookRequest>> GetByBookIdAsync(int bookId);
+
+	Task<IEnumerable<BookRequest>> GetByRequesterIdAsync(string requesterId);
+
+	Task AddAsync(BookRequest request);
+
+	Task UpdateAsync(BookRequest request);
 }
