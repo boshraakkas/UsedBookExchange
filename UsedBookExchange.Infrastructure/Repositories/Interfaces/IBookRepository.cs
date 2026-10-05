@@ -1,16 +1,22 @@
 ﻿using UsedBookExchange.Domain.Entities;
+using UsedBookExchange.Domain.Enums;
 
 namespace UsedBookExchange.Infrastructure.Repositories.Interfaces;
 
 public interface IBookRepository
 {
-	Task<IEnumerable<Book>> GetAllAsync();
+    Task<IEnumerable<Book>> GetAllAsync();
 
-	Task<Book?> GetByIdAsync(int id);
+    Task<IEnumerable<Book>> SearchAsync(
+        string? searchTerm,
+        string? category,
+        BookCondition? condition);
 
-	Task AddAsync(Book book);
+    Task<Book?> GetByIdAsync(int id);
 
-	Task UpdateAsync(Book book);
+    Task AddAsync(Book book);
 
-	Task DeleteAsync(Book book);
+    Task UpdateAsync(Book book);
+
+    Task DeleteAsync(Book book);
 }

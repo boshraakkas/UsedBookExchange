@@ -17,12 +17,28 @@ public class BooksController : Controller
     }
 
     // GET: /Books
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(
+      string? searchTerm,
+      string? category,
+      BookCondition? condition)
     {
-        var books = await _bookRepository.GetAllAsync();
+        var books = await _bookRepository.SearchAsync(
+            searchTerm,
+            category,
+            condition);
+
+        ViewBag.SearchTerm = searchTerm;
+        ViewBag.Category = category;
+        ViewBag.Condition = condition;
 
         return View(books);
     }
+
+
+
+
+
+
 
     // GET: /Books/Details/5
     public async Task<IActionResult> Details(int id)

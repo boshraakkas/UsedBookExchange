@@ -2,29 +2,190 @@
 
 @{
     ViewData["Title"] = "Books";
+
+    var categories = Model
+        .Select(book => book.Category)
+        .Where(category => !string.IsNullOrWhiteSpace(category))
+        .Distinct()
+        .OrderBy(category => category)
+        .ToList();
 }
 
 <div class="container mt-4">
 
+    <!-- Page Header -->
+
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Available Books</h1>
+
+        <h1>Books</h1>
 
         @if (User.Identity?.IsAuthenticated == true)
         {
-            <a asp-action="Create" class="btn btn-primary">
+            <a asp-action="Create"
+               class="btn btn-primary">
                 Add Book
             </a>
         }
+
     </div>
 
+
+    <!-- Search and Filter -->
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <h5 class="card-title mb-3">
+                Search and Filter
+            </h5>
+
+            <form asp-action="Index"
+                  method="get">
+
+                <div class="row g-3">
+
+                    <!-- Search -->
+
+                    <div class="col-md-5">
+
+                        <label for="searchTerm"
+                               class="form-label">
+                            Search
+                        </label>
+
+                        <input type="text"
+                               id="searchTerm"
+                               name="searchTerm"
+                               value="@ViewBag.SearchTerm"
+                               class="form-control"
+                               placeholder="Search by title or author..." />
+
+                    </div>
+
+
+                    <!-- Category -->
+
+                    <div class="col-md-3">
+
+                        <label for="category"
+                               class="form-label">
+                            Category
+                        </label>
+
+                        <select id="category"
+                                name="category"
+                                class="form-select">
+
+                            <option value="">
+                                All Categories
+                            </option>
+
+                            @foreach (var item in categories)
+                            {
+                                if (item == ViewBag.Category)
+                                {
+                                    <option value="@item"
+                                            selected>
+                                        @item
+                                    </option>
+                                }
+                                else
+                                {
+                                    <option value="@item">
+                                        @item
+                                    </option>
+                                }
+                            }
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Condition -->
+
+                    <div class="col-md-3">
+
+                        <label for="condition"
+                               class="form-label">
+                            Condition
+                        </label>
+
+                        <select id="condition"
+                                name="condition"
+                                class="form-select">
+
+                            <option value="">
+                                All Conditions
+                            </option>
+
+                            @foreach (var item in
+                            Enum.GetValues<
+                            UsedBookExchange.Domain.Enums.BookCondition>())
+                            {
+                                if (ViewBag.Condition != null &&
+                                (UsedBookExchange.Domain.Enums.BookCondition)
+                                ViewBag.Condition == item)
+                                {
+                                    <option value="@item"
+                                            selected>
+                                        @item
+                                    </option>
+                                }
+                                else
+                                {
+                                    <option value="@item">
+                                        @item
+                                    </option>
+                                }
+                            }
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Buttons -->
+
+                    <div class="col-md-1 d-flex align-items-end">
+
+                        <button type="submit"
+                                class="btn btn-primary w-100">
+                            Search
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- Results -->
     @if (!Model.Any())
     {
         <div class="alert alert-info">
-            No books are available yet.
+            No books match your search criteria.
         </div>
     }
     else
     {
+        <div class="mb-3">
+
+            <strong>
+                @Model.Count()
+            </strong>
+
+            book(s) found.
+
+        </div>
+
+
         <div class="row">
 
             @foreach (var book in Model)
@@ -41,6 +202,7 @@
                                  style="height: 250px; object-fit: cover;" />
                         }
 
+
                         <div class="card-body">
 
                             <h5 class="card-title">
@@ -48,22 +210,50 @@
                             </h5>
 
                             <p class="card-text">
-                                <strong>Author:</strong> @book.Author
+                                <strong>Author:</strong>
+                                @book.Author
                             </p>
 
                             <p class="card-text">
-                                <strong>Category:</strong> @book.Category
+                                <strong>Category:</strong>
+                                @book.Category
                             </p>
 
                             <p class="card-text">
-                                <strong>Condition:</strong> @book.Condition
+                                <strong>Condition:</strong>
+                                @book.Condition
                             </p>
 
+
                             <p class="card-text">
-                                <strong>Status:</strong> @book.Status
+
+                                <strong>Status:</strong>
+
+                                @if (book.Status ==
+                               UsedBookExchange.Domain.Enums.BookStatus.Available)
+                                {
+                                    <span class="badge bg-success">
+                                        Available
+                                    </span>
+                                }
+                                else if (book.Status ==
+                                UsedBookExchange.Domain.Enums.BookStatus.Reserved)
+                                {
+                                    <span class="badge bg-warning text-dark">
+                                        Reserved
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        Exchanged
+                                    </span>
+                                }
+
                             </p>
 
                         </div>
+
 
                         <div class="card-footer bg-white">
 
