@@ -4,125 +4,251 @@
     ViewData["Title"] = "Add Book";
 }
 
-<div class="container mt-4">
-
-    <div class="row justify-content-center">
-
-        <div class="col-md-8">
-
-            <h1 class="mb-4">Add a Book</h1>
-
-            <form asp-action="Create" method="post">
-
-                @Html.AntiForgeryToken()
-
-                <div asp-validation-summary="ModelOnly"
-                     class="text-danger mb-3">
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Title"
-                           class="form-label">
-                    </label>
-
-                    <input asp-for="Title"
-                           class="form-control" />
-
-                    <span asp-validation-for="Title"
-                          class="text-danger">
-                    </span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Author"
-                           class="form-label">
-                    </label>
-
-                    <input asp-for="Author"
-                           class="form-control" />
-
-                    <span asp-validation-for="Author"
-                          class="text-danger">
-                    </span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Category"
-                           class="form-label">
-                    </label>
-
-                    <input asp-for="Category"
-                           class="form-control" />
-
-                    <span asp-validation-for="Category"
-                          class="text-danger">
-                    </span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Condition"
-                           class="form-label">
-                    </label>
-
-                    <select asp-for="Condition"
-                            class="form-select"
-                            asp-items="Html.GetEnumSelectList<UsedBookExchange.Domain.Enums.BookCondition>()">
-                        <option value="">Select condition</option>
-                    </select>
-
-                    <span asp-validation-for="Condition"
-                          class="text-danger">
-                    </span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Description"
-                           class="form-label">
-                    </label>
-
-                    <textarea asp-for="Description"
-                              class="form-control"
-                              rows="5">
-                    </textarea>
-
-                    <span asp-validation-for="Description"
-                          class="text-danger">
-                    </span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="ImageUrl"
-                           class="form-label">
-                    </label>
-
-                    <input asp-for="ImageUrl"
-                           class="form-control"
-                           placeholder="https://example.com/book.jpg" />
-
-                    <span asp-validation-for="ImageUrl"
-                          class="text-danger">
-                    </span>
-                </div>
-
-                <div class="mt-4">
-
-                    <button type="submit"
-                            class="btn btn-primary">
-                        Add Book
-                    </button>
-
-                    <a asp-action="Index"
-                       class="btn btn-secondary ms-2">
-                        Cancel
-                    </a>
-
-                </div>
-
-            </form>
-
+<section class="form-page-header">
+    <div class="container">
+        <div class="form-breadcrumb">
+            <a asp-action="Index">Books</a>
+            <span>/</span>
+            <span>Add Book</span>
         </div>
 
+        ```
+        <div class="form-header-content">
+            <span class="form-eyebrow">SHARE A BOOK</span>
+
+            <h1 class="form-page-title">
+                Give your book a new home.
+            </h1>
+
+            <p class="form-page-description">
+                Add the details of your book so other readers
+                can discover and request it.
+            </p>
+        </div>
     </div>
+    ```
+
+</section>
+
+<div class="container pb-5">
+    <div class="row justify-content-center">
+        <div class="col-xl-8 col-lg-9">
+
+            ```
+            <div class="form-card">
+
+                <div class="form-card-header">
+                    <div class="form-card-icon">📚</div>
+
+                    <div>
+                        <h2>Book Information</h2>
+                        <p>Fill in the information below.</p>
+                    </div>
+                </div>
+
+                <div class="form-card-body">
+
+                    <form asp-action="Create"
+                          method="post"
+                          enctype="multipart/form-data">
+
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="alert alert-danger mb-4">
+                        </div>
+
+                        <!-- Title -->
+                        <div class="mb-4">
+
+                            <label asp-for="Title"
+                                   class="form-label">
+                                Book Title
+                                <span class="required-mark">*</span>
+                            </label>
+
+                            <input asp-for="Title"
+                                   class="form-control form-control-lg"
+                                   placeholder="Enter the book title"
+                                   autocomplete="off" />
+
+                            <span asp-validation-for="Title"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <!-- Author -->
+                        <div class="mb-4">
+
+                            <label asp-for="Author"
+                                   class="form-label">
+                                Author
+                                <span class="required-mark">*</span>
+                            </label>
+
+                            <input asp-for="Author"
+                                   class="form-control form-control-lg"
+                                   placeholder="Enter the author's name"
+                                   autocomplete="off" />
+
+                            <span asp-validation-for="Author"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <!-- Category + Condition -->
+                        <div class="row g-4 mb-4">
+
+                            <div class="col-md-6">
+
+                                <label asp-for="Category"
+                                       class="form-label">
+                                    Category
+                                    <span class="required-mark">*</span>
+                                </label>
+
+                                <input asp-for="Category"
+                                       class="form-control form-control-lg"
+                                       placeholder="e.g. Programming"
+                                       autocomplete="off" />
+
+                                <span asp-validation-for="Category"
+                                      class="text-danger">
+                                </span>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label asp-for="Condition"
+                                       class="form-label">
+                                    Condition
+                                    <span class="required-mark">*</span>
+                                </label>
+
+                                <select asp-for="Condition"
+                                        class="form-select form-select-lg">
+
+                                    <option value="">
+                                        Select condition
+                                    </option>
+
+                                    @foreach (var condition in
+                                    Enum.GetValues<UsedBookExchange.Domain.Enums.BookCondition>())
+                                    {
+                                        <option value="@condition">
+                                            @condition
+                                        </option>
+                                    }
+
+                                </select>
+
+                                <span asp-validation-for="Condition"
+                                      class="text-danger">
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-4">
+
+                            <label asp-for="Description"
+                                   class="form-label">
+                                Description
+                            </label>
+
+                            <textarea asp-for="Description"
+                                      class="form-control"
+                                      rows="6"
+                                      placeholder="Tell other readers something about this book...">
+                        </textarea>
+
+                            <div class="form-help-text">
+                                You can mention the book's condition,
+                                edition or anything useful for another reader.
+                            </div>
+
+                            <span asp-validation-for="Description"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <!-- Image Upload -->
+                        <div class="mb-4">
+
+                            <label asp-for="Image"
+                                   class="form-label">
+                                Book Cover Image
+                            </label>
+
+                            <input asp-for="Image"
+                                   type="file"
+                                   class="form-control form-control-lg"
+                                   accept=".jpg,.jpeg,.png,.webp" />
+
+                            <div class="form-help-text">
+                                Optional. Supported formats:
+                                JPG, JPEG, PNG and WEBP.
+                                Maximum size: 5 MB.
+                            </div>
+
+                            <span asp-validation-for="Image"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <!-- Information -->
+                        <div class="form-info-box">
+
+                            <span class="form-info-icon">
+                                ℹ
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    Before you add your book
+                                </strong>
+
+                                <p>
+                                    Make sure the information is accurate.
+                                    Other users will use these details
+                                    when deciding whether to request the book.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="form-actions">
+
+                            <a asp-action="Index"
+                               class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+
+                            <button type="submit"
+                                    class="btn btn-primary px-4">
+                                Add Book
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+    ```
 
 </div>
 

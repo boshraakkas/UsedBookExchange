@@ -2,88 +2,302 @@
 
 @{
     ViewData["Title"] = "Book Details";
+
+    var currentUserId = User.FindFirst(
+        System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+    var isAuthenticated =
+        User.Identity?.IsAuthenticated == true;
+
+    var isOwner =
+        isAuthenticated &&
+        Model.OwnerId == currentUserId;
+
+    var isAvailable =
+        Model.Status ==
+        UsedBookExchange.Domain.Enums.BookStatus.Available;
 }
 
-<div class="container mt-4">
+<section class="book-details-header">
+    <div class="container">
+        <div class="book-details-breadcrumb">
+            <a asp-action="Index">
+                Books
+            </a>
 
-    <div class="row">
+            <span>/</span>
 
-        <div class="col-md-5">
-
-            @if (!string.IsNullOrEmpty(Model.ImageUrl))
-            {
-                <img src="@Model.ImageUrl"
-                     alt="@Model.Title"
-                     class="img-fluid rounded shadow-sm"
-                     style="max-height: 500px; width: 100%; object-fit: cover;" />
-            }
-            else
-            {
-                <div class="bg-light border rounded d-flex align-items-center justify-content-center"
-                     style="height: 400px;">
-                    <span class="text-muted">No image available</span>
-                </div>
-            }
-
+            <span>
+                @Model.Title
+            </span>
         </div>
+    </div>
+</section>
 
-        <div class="col-md-7">
+<div class="container pb-5">
 
-            <h1 class="mb-3">@Model.Title</h1>
+    <div class="book-details-card">
 
-            <p>
-                <strong>Author:</strong>
-                @Model.Author
-            </p>
+        <div class="row g-0">
 
-            <p>
-                <strong>Category:</strong>
-                @Model.Category
-            </p>
+            <!-- Book Image -->
+            <div class="col-lg-5">
 
-            <p>
-                <strong>Condition:</strong>
-                @Model.Condition
-            </p>
+                <div class="book-details-image-wrapper">
 
-            <p>
-                <strong>Status:</strong>
-                @Model.Status
-            </p>
+                    @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+                    {
+                        <img src="@Model.ImageUrl"
+                             alt="@Model.Title"
+                             class="book-details-image" />
+                    }
+                    else
+                    {
+                        <div class="book-details-placeholder">
+                            <span>📖</span>
 
-            <hr />
+                            <p>
+                                No cover available
+                            </p>
+                        </div>
+                    }
 
-            <h5>Description</h5>
+                </div>
 
-            <p>
-                @if (string.IsNullOrWhiteSpace(Model.Description))
-                {
-                    <span class="text-muted">
-                        No description provided.
-                    </span>
-                }
-                else
-                {
-                    @Model.Description
-                }
-            </p>
+            </div>
 
-            <div class="mt-4">
+            <!-- Book Information -->
+            <div class="col-lg-7">
 
-                <a asp-action="Index"
-                   class="btn btn-secondary">
-                    Back to Books
-                </a>
+                <div class="book-details-content">
 
-                @if (User.Identity?.IsAuthenticated == true)
-                {
-                    <a asp-controller="Requests"
-                       asp-action="Create"
-                       asp-route-bookId="@Model.Id"
-                       class="btn btn-success">
-                        Request This Book
-                    </a>
-                }
+                    <div class="d-flex
+                                flex-wrap
+                                justify-content-between
+                                align-items-start
+                                gap-3">
+
+                        <div>
+
+                            <span class="details-category">
+                                @Model.Category
+                            </span>
+
+                            <h1 class="details-title">
+                                @Model.Title
+                            </h1>
+
+                            <p class="details-author">
+                                by @Model.Author
+                            </p>
+
+                        </div>
+
+                        <!-- Book Status -->
+                        <div>
+
+                            @if (Model.Status ==
+                            UsedBookExchange.Domain.Enums.BookStatus.Available)
+                            {
+                                <span class="premium-status available">
+                                    <span class="status-dot"></span>
+                                    Available
+                                </span>
+                            }
+                            else if (Model.Status ==
+                            UsedBookExchange.Domain.Enums.BookStatus.Reserved)
+                            {
+                                <span class="premium-status reserved">
+                                    <span class="status-dot"></span>
+                                    Reserved
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="premium-status exchanged">
+                                    <span class="status-dot"></span>
+                                    Exchanged
+                                </span>
+                            }
+
+                        </div>
+
+                    </div>
+
+                    <div class="details-divider"></div>
+
+                    <!-- Book Information -->
+                    <div class="row g-4 mb-4">
+
+                        <div class="col-sm-6">
+
+                            <span class="book-info-label">
+                                Condition
+                            </span>
+
+                            <div class="book-info-value">
+                                @Model.Condition
+                            </div>
+
+                        </div>
+
+                        <div class="col-sm-6">
+
+                            <span class="book-info-label">
+                                Category
+                            </span>
+
+                            <div class="book-info-value">
+                                @Model.Category
+                            </div>
+
+                        </div>
+
+                        <div class="col-sm-6">
+
+                            <span class="book-info-label">
+                                Added On
+                            </span>
+
+                            <div class="book-info-value">
+                                @Model.CreatedAt
+                                .ToLocalTime()
+                                .ToString("yyyy-MM-dd")
+                            </div>
+
+                        </div>
+
+                        <div class="col-sm-6">
+
+                            <span class="book-info-label">
+                                Status
+                            </span>
+
+                            <div class="book-info-value">
+                                @Model.Status
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Description -->
+                    <div class="details-description">
+
+                        <span class="book-info-label">
+                            About This Book
+                        </span>
+
+                        @if (!string.IsNullOrWhiteSpace(Model.Description))
+                        {
+                            <p>
+                                @Model.Description
+                            </p>
+                        }
+                        else
+                        {
+                            <p class="text-muted">
+                                No description was provided
+                                for this book.
+                            </p>
+                        }
+
+                    </div>
+
+                    <div class="details-divider"></div>
+
+                    <!-- Actions -->
+                    <div class="details-actions">
+
+                        @if (!isAuthenticated)
+                        {
+                            <a asp-controller="Account"
+                               asp-action="Login"
+                               class="btn btn-primary btn-lg">
+
+                                Login to Request
+
+                            </a>
+                        }
+                        else if (isOwner)
+                        {
+                            <div class="owner-message">
+
+                                <span>✓</span>
+
+                                <div>
+                                    <strong>
+                                        This is your book
+                                    </strong>
+
+                                    <small>
+                                        You can manage your
+                                        listing below.
+                                    </small>
+                                </div>
+
+                            </div>
+
+                            @if (isAvailable)
+                            {
+                                <a asp-action="Edit"
+                                   asp-route-id="@Model.Id"
+                                   class="btn btn-primary">
+
+                                    Edit Book
+
+                                </a>
+
+                                <a asp-action="Delete"
+                                   asp-route-id="@Model.Id"
+                                   class="btn btn-outline-danger">
+
+                                    Delete
+
+                                </a>
+                            }
+                        }
+                        else if (isAvailable)
+                        {
+                            <a asp-controller="Requests"
+                               asp-action="Create"
+                               asp-route-bookId="@Model.Id"
+                               class="btn btn-primary btn-lg px-4">
+
+                                Request This Book
+
+                            </a>
+                        }
+                        else
+                        {
+                            <div class="unavailable-message">
+
+                                <span>ℹ</span>
+
+                                <div>
+                                    <strong>
+                                        Book unavailable
+                                    </strong>
+
+                                    <small>
+                                        This book is currently
+                                        not available for exchange.
+                                    </small>
+                                </div>
+
+                            </div>
+                        }
+
+                        <a asp-action="Index"
+                           class="btn btn-outline-secondary">
+
+                            ← Back to Books
+
+                        </a>
+
+                    </div>
+
+                </div>
 
             </div>
 

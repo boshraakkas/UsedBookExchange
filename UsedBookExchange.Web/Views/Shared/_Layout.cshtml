@@ -1,15 +1,15 @@
 ﻿<!DOCTYPE html>
+
 <html lang="en">
 
 <head>
-
     <meta charset="utf-8" />
 
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0" />
 
     <title>
-        @ViewData["Title"] - UsedBookExchange.Web
+        @ViewData["Title"] - UsedBookExchange
     </title>
 
     <link rel="stylesheet"
@@ -19,37 +19,34 @@
           href="~/css/site.css"
           asp-append-version="true" />
 
-    <link rel="stylesheet"
-          href="~/UsedBookExchange.Web.styles.css"
-          asp-append-version="true" />
-
 </head>
 
 <body>
 
+    <!-- =========================
+         NAVBAR
+    ========================== -->
+
     <header>
 
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-lg custom-navbar">
 
-            <div class="container-fluid">
-
-                <!-- Application Name -->
+            <div class="container">
 
                 <a class="navbar-brand"
-                   asp-area=""
                    asp-controller="Home"
                    asp-action="Index">
-                    UsedBookExchange.Web
+
+                     UsedBookExchange
+
                 </a>
 
-
-                <!-- Mobile Menu Button -->
 
                 <button class="navbar-toggler"
                         type="button"
                         data-bs-toggle="collapse"
-                        data-bs-target=".navbar-collapse"
-                        aria-controls="navbarSupportedContent"
+                        data-bs-target="#mainNavbar"
+                        aria-controls="mainNavbar"
                         aria-expanded="false"
                         aria-label="Toggle navigation">
 
@@ -58,35 +55,34 @@
                 </button>
 
 
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <div class="collapse navbar-collapse"
+                     id="mainNavbar">
 
                     <!-- Main Navigation -->
 
-                    <ul class="navbar-nav flex-grow-1">
-
-                        <!-- Home -->
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
                         <li class="nav-item">
 
-                            <a class="nav-link text-dark"
-                               asp-area=""
+                            <a class="nav-link"
                                asp-controller="Home"
                                asp-action="Index">
+
                                 Home
+
                             </a>
 
                         </li>
 
 
-                        <!-- Books -->
-
                         <li class="nav-item">
 
-                            <a class="nav-link text-dark"
-                               asp-area=""
+                            <a class="nav-link"
                                asp-controller="Books"
                                asp-action="Index">
+
                                 Books
+
                             </a>
 
                         </li>
@@ -94,130 +90,119 @@
 
                         @if (User.Identity?.IsAuthenticated == true)
                         {
-                            <!-- Add Book -->
 
                             <li class="nav-item">
 
-                                <a class="nav-link text-dark"
-                                   asp-area=""
+                                <a class="nav-link"
                                    asp-controller="Books"
                                    asp-action="Create">
+
                                     Add Book
+
                                 </a>
 
                             </li>
 
 
-                            <!-- My Requests -->
-
                             <li class="nav-item">
 
-                                <a class="nav-link text-dark"
-                                   asp-area=""
+                                <a class="nav-link"
                                    asp-controller="Requests"
                                    asp-action="MyRequests">
+
                                     My Requests
+
                                 </a>
 
                             </li>
 
-
-                            <!-- Received Requests -->
 
                             <li class="nav-item">
 
-                                <a class="nav-link text-dark"
-                                   asp-area=""
+                                <a class="nav-link"
                                    asp-controller="Requests"
                                    asp-action="ReceivedRequests">
+
                                     Received Requests
+
                                 </a>
 
                             </li>
+
                         }
-
-
-                        <!-- Privacy -->
-
-                        <li class="nav-item">
-
-                            <a class="nav-link text-dark"
-                               asp-area=""
-                               asp-controller="Home"
-                               asp-action="Privacy">
-                                Privacy
-                            </a>
-
-                        </li>
 
                     </ul>
 
 
-                    <!-- Account Navigation -->
+                    <!-- User Navigation -->
 
-                    <ul class="navbar-nav">
+                    <ul class="navbar-nav align-items-lg-center">
 
                         @if (User.Identity?.IsAuthenticated == true)
                         {
-                            <!-- Logged-in User -->
 
                             <li class="nav-item">
 
-                                <span class="nav-link text-dark">
-                                    Hello, @User.Identity.Name
+                                <span class="navbar-text me-3">
+
+                                    Hello,
+                                    <strong>
+                                        @User.Identity.Name
+                                    </strong>
+
                                 </span>
 
                             </li>
 
 
-                            <!-- Logout -->
-
                             <li class="nav-item">
 
                                 <form asp-controller="Account"
                                       asp-action="Logout"
-                                      method="post"
-                                      class="d-inline">
+                                      method="post">
 
                                     @Html.AntiForgeryToken()
 
                                     <button type="submit"
-                                            class="btn btn-link nav-link text-dark">
+                                            class="btn btn-outline-light btn-sm">
+
                                         Logout
+
                                     </button>
 
                                 </form>
 
                             </li>
+
                         }
                         else
                         {
-                            <!-- Login -->
 
                             <li class="nav-item">
 
-                                <a class="nav-link text-dark"
-                                   asp-area=""
+                                <a class="nav-link"
                                    asp-controller="Account"
                                    asp-action="Login">
+
                                     Login
+
                                 </a>
 
                             </li>
 
 
-                            <!-- Register -->
+                            <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
 
-                            <li class="nav-item">
-
-                                <a class="nav-link text-dark"
-                                   asp-area=""
+                                <a class="btn btn-light btn-sm register-btn"
                                    asp-controller="Account"
                                    asp-action="Register">
+
                                     Register
+
                                 </a>
 
                             </li>
+
                         }
 
                     </ul>
@@ -231,40 +216,71 @@
     </header>
 
 
-    <!-- Main Content -->
+    <!-- =========================
+         MAIN CONTENT
+    ========================== -->
 
-    <div class="container">
+    <main>
 
-        <main role="main"
-              class="pb-3">
+        @RenderBody()
 
-            @RenderBody()
-
-        </main>
-
-    </div>
+    </main>
 
 
-    <!-- Footer -->
+    <!-- =========================
+         FOOTER
+    ========================== -->
 
-    <footer class="border-top footer text-muted">
+    <footer class="custom-footer">
 
         <div class="container">
 
-            &copy; 2026 - UsedBookExchange.Web -
+            <div class="row py-5">
 
-            <a asp-area=""
-               asp-controller="Home"
-               asp-action="Privacy">
-                Privacy
-            </a>
+                <div class="col-md-7">
+
+                    <h5>
+                        📚 UsedBookExchange
+                    </h5>
+
+                    <p class="mb-0">
+                        A simple and reliable platform for
+                        exchanging used books with other readers.
+                    </p>
+
+                </div>
+
+
+                <div class="col-md-5 text-md-end mt-4 mt-md-0">
+
+                    <a asp-controller="Home"
+                       asp-action="Privacy"
+                       class="footer-link">
+
+                        Privacy
+
+                    </a>
+
+                    <span class="mx-2">
+                        •
+                    </span>
+
+                    <span>
+                        © @DateTime.Now.Year UsedBookExchange
+                    </span>
+
+                </div>
+
+            </div>
 
         </div>
 
     </footer>
 
 
-    <!-- Scripts -->
+    <!-- =========================
+         SCRIPTS
+    ========================== -->
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
 
@@ -277,7 +293,7 @@
     @await RenderSectionAsync(
             "Scripts",
             required: false)
-
+    
 </body>
 
 </html>

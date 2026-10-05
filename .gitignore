@@ -26,3 +26,5 @@ packages/
 # OS files
 .DS_Store
 Thumbs.db
+# Uploaded files
+UsedBookExchange.Web/wwwroot/uploads/

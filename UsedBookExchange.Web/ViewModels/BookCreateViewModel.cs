@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 using UsedBookExchange.Domain.Enums;
 
 namespace UsedBookExchange.Web.ViewModels;
@@ -10,7 +11,6 @@ public class BookCreateViewModel
     200,
     ErrorMessage = "Title cannot exceed 200 characters.")]
     public string Title { get; set; } = string.Empty;
-
 
 [Required(ErrorMessage = "Author is required.")]
     [StringLength(
@@ -32,7 +32,6 @@ public class BookCreateViewModel
     [Required(ErrorMessage = "Please select the book condition.")]
     public BookCondition? Condition { get; set; }
 
-    [Url(ErrorMessage = "Please enter a valid image URL.")]
-    public string? ImageUrl { get; set; }
+    public IFormFile? Image { get; set; }
 
 }

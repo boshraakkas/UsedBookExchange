@@ -1,312 +1,1073 @@
 ﻿@model IEnumerable<UsedBookExchange.Domain.Entities.Book>
 
 @{
-    ViewData["Title"] = "Books";
+ViewData["Title"] = "Books";
 
-var categories = Model
+
+var books = Model.ToList();
+
+var categories = books
     .Select(book => book.Category)
     .Where(category => !string.IsNullOrWhiteSpace(category))
     .Distinct()
     .OrderBy(category => category)
     .ToList();
 
-    var currentUserId = User.FindFirst(
-        System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+var currentUserId = User.FindFirst(
+    System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+var availableCount = books.Count(book =>
+    book.Status == UsedBookExchange.Domain.Enums.BookStatus.Available);
+
+var reservedCount = books.Count(book =>
+    book.Status == UsedBookExchange.Domain.Enums.BookStatus.Reserved);
+
+var exchangedCount = books.Count(book =>
+    book.Status == UsedBookExchange.Domain.Enums.BookStatus.Exchanged);
 
 }
 
-<div class="container mt-4">
+<!-- =========================================================
+     PAGE HEADER
+========================================================= -->
 
-    <!-- Page Header -->
+<section class="books-header">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="container">
 
-        <h1>Books</h1>
+    <div class="row align-items-center">
 
-        @if (User.Identity?.IsAuthenticated == true)
-        {
-            <a asp-action="Create"
-               class="btn btn-primary">
-                Add Book
-            </a>
-        }
+        <div class="col-lg-8">
+
+            <span class="books-eyebrow">
+                EXPLORE THE COLLECTION
+            </span>
+
+            <h1 class="books-title">
+                Discover books worth sharing.
+            </h1>
+
+            <p class="books-description">
+                Browse books shared by our community,
+                find your next read and request an exchange.
+            </p>
+
+        </div>
+
+
+        <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a asp-action="Create"
+                   class="btn btn-primary btn-lg px-4">
+
+                    <span class="me-2">+</span>
+                    Add Your Book
+
+                </a>
+            }
+
+        </div>
 
     </div>
 
+</div>
 
-    <!-- Search and Filter -->
+</section>
 
-    <div class="card shadow-sm mb-4">
+<div class="container pb-5">
 
-        <div class="card-body">
+<!-- =====================================================
+     STATISTICS
+====================================================== -->
 
-            <h5 class="card-title mb-3">
-                Search and Filter
+<div class="books-statistics">
+
+    <div class="row g-3">
+
+        <div class="col-6 col-lg-3">
+
+            <div class="stat-card">
+
+                <div class="stat-icon stat-icon-primary">
+                    📚
+                </div>
+
+                <div>
+                    <span class="stat-label">
+                        Total Books
+                    </span>
+
+                    <strong class="stat-value">
+                        @books.Count
+                    </strong>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-6 col-lg-3">
+
+            <div class="stat-card">
+
+                <div class="stat-icon stat-icon-success">
+                    ✓
+                </div>
+
+                <div>
+                    <span class="stat-label">
+                        Available
+                    </span>
+
+                    <strong class="stat-value">
+                        @availableCount
+                    </strong>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-6 col-lg-3">
+
+            <div class="stat-card">
+
+                <div class="stat-icon stat-icon-warning">
+                    ↻
+                </div>
+
+                <div>
+                    <span class="stat-label">
+                        Reserved
+                    </span>
+
+                    <strong class="stat-value">
+                        @reservedCount
+                    </strong>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-6 col-lg-3">
+
+            <div class="stat-card">
+
+                <div class="stat-icon stat-icon-dark">
+                    ✓
+                </div>
+
+                <div>
+                    <span class="stat-label">
+                        Exchanged
+                    </span>
+
+                    <strong class="stat-value">
+                        @exchangedCount
+                    </strong>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     SEARCH PANEL
+====================================================== -->
+
+<div class="professional-search">
+
+    <div class="search-heading">
+
+        <div class="search-heading-icon">
+            🔎
+        </div>
+
+        <div>
+
+            <h5>
+                Find your next book
             </h5>
 
-            <form asp-action="Index"
-                  method="get">
-
-                <div class="row g-3">
-
-                    <!-- Search -->
-
-                    <div class="col-md-5">
-
-                        <label for="searchTerm"
-                               class="form-label">
-                            Search
-                        </label>
-
-                        <input type="text"
-                               id="searchTerm"
-                               name="searchTerm"
-                               value="@ViewBag.SearchTerm"
-                               class="form-control"
-                               placeholder="Search by title or author..." />
-
-                    </div>
-
-
-                    <!-- Category -->
-
-                    <div class="col-md-3">
-
-                        <label for="category"
-                               class="form-label">
-                            Category
-                        </label>
-
-                        <select id="category"
-                                name="category"
-                                class="form-select">
-
-                            <option value="">
-                                All Categories
-                            </option>
-
-                            @foreach (var item in categories)
-                            {
-                                if (item == ViewBag.Category)
-                                {
-                                    <option value="@item"
-                                            selected>
-                                        @item
-                                    </option>
-                                }
-                                else
-                                {
-                                    <option value="@item">
-                                        @item
-                                    </option>
-                                }
-                            }
-
-                        </select>
-
-                    </div>
-
-
-                    <!-- Condition -->
-
-                    <div class="col-md-3">
-
-                        <label for="condition"
-                               class="form-label">
-                            Condition
-                        </label>
-
-                        <select id="condition"
-                                name="condition"
-                                class="form-select">
-
-                            <option value="">
-                                All Conditions
-                            </option>
-
-                            @foreach (var item in
-                            Enum.GetValues<
-                            UsedBookExchange.Domain.Enums.BookCondition>())
-                            {
-                                if (ViewBag.Condition != null &&
-                                (UsedBookExchange.Domain.Enums.BookCondition)
-                                ViewBag.Condition == item)
-                                {
-                                    <option value="@item"
-                                            selected>
-                                        @item
-                                    </option>
-                                }
-                                else
-                                {
-                                    <option value="@item">
-                                        @item
-                                    </option>
-                                }
-                            }
-
-                        </select>
-
-                    </div>
-
-
-                    <!-- Search Button -->
-
-                    <div class="col-md-1 d-flex align-items-end">
-
-                        <button type="submit"
-                                class="btn btn-primary w-100">
-                            Search
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </form>
+            <p>
+                Search by title or author and refine
+                your results using filters.
+            </p>
 
         </div>
 
     </div>
 
 
-    <!-- Results -->
-    @if (!Model.Any())
-    {
-        <div class="alert alert-info">
-            No books match your search criteria.
-        </div>
-    }
-    else
-    {
-        <div class="mb-3">
+    <form asp-action="Index"
+          method="get">
 
-            <strong>
-                @Model.Count()
-            </strong>
-
-            book(s) found.
-
-        </div>
+        <div class="row g-3">
 
 
-        <div class="row">
+            <!-- Search -->
 
-            @foreach (var book in Model)
-            {
-                <div class="col-md-4 mb-4">
+            <div class="col-lg-5">
 
-                    <div class="card h-100 shadow-sm">
+                <label for="searchTerm">
+                    Search
+                </label>
 
-                        <!-- Book Image -->
-                        @if (!string.IsNullOrEmpty(book.ImageUrl))
-                        {
-                            <img src="@book.ImageUrl"
-                                 class="card-img-top"
-                                 alt="@book.Title"
-                                 style="height: 250px; object-fit: cover;" />
-                        }
+                <div class="search-input-wrapper">
 
+                    <span>
+                        🔎
+                    </span>
 
-                        <div class="card-body">
-
-                            <!-- Title -->
-
-                            <h5 class="card-title">
-                                @book.Title
-                            </h5>
-
-
-                            <!-- Author -->
-
-                            <p class="card-text">
-                                <strong>Author:</strong>
-                                @book.Author
-                            </p>
-
-
-                            <!-- Category -->
-
-                            <p class="card-text">
-                                <strong>Category:</strong>
-                                @book.Category
-                            </p>
-
-
-                            <!-- Condition -->
-
-                            <p class="card-text">
-                                <strong>Condition:</strong>
-                                @book.Condition
-                            </p>
-
-
-                            <!-- Status -->
-
-                            <p class="card-text">
-
-                                <strong>Status:</strong>
-
-                                @if (book.Status ==
-                               UsedBookExchange.Domain.Enums.BookStatus.Available)
-                                {
-                                    <span class="badge bg-success">
-                                        Available
-                                    </span>
-                                }
-                                else if (book.Status ==
-                                UsedBookExchange.Domain.Enums.BookStatus.Reserved)
-                                {
-                                    <span class="badge bg-warning text-dark">
-                                        Reserved
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary">
-                                        Exchanged
-                                    </span>
-                                }
-
-                            </p>
-
-                        </div>
-
-
-                        <!-- Card Footer -->
-
-                        <div class="card-footer bg-white">
-
-                            <!-- Details -->
-
-                            <a asp-action="Details"
-                               asp-route-id="@book.Id"
-                               class="btn btn-outline-primary">
-                                Details
-                            </a>
-
-
-                            <!-- Edit - Owner Only -->
-                            @if (User.Identity?.IsAuthenticated == true &&
-                           book.OwnerId == currentUserId &&
-                           book.Status ==
-                           UsedBookExchange.Domain.Enums.BookStatus.Available)
-                            {
-                                <a asp-action="Edit"
-                                   asp-route-id="@book.Id"
-                                   class="btn btn-outline-warning ms-2">
-                                    Edit
-                                </a>
-                            }
-
-                        </div>
-
-                    </div>
+                    <input type="text"
+                           id="searchTerm"
+                           name="searchTerm"
+                           value="@ViewBag.SearchTerm"
+                           placeholder="Book title or author..."
+                           autocomplete="off" />
 
                 </div>
-            }
+
+            </div>
+
+
+            <!-- Category -->
+
+            <div class="col-lg-3">
+
+                <label for="category">
+                    Category
+                </label>
+
+                <select id="category"
+                        name="category">
+
+                    <option value="">
+                        All Categories
+                    </option>
+
+                    @foreach (var item in categories)
+                    {
+                        if (item == ViewBag.Category)
+                        {
+                            <option value="@item"
+                                    selected>
+                                @item
+                            </option>
+                        }
+                        else
+                        {
+                            <option value="@item">
+                                @item
+                            </option>
+                        }
+                    }
+
+                </select>
+
+            </div>
+
+
+            <!-- Condition -->
+
+            <div class="col-lg-2">
+
+                <label for="condition">
+                    Condition
+                </label>
+
+                <select id="condition"
+                        name="condition">
+
+                    <option value="">
+                        All
+                    </option>
+
+                    @foreach (var item in
+                    Enum.GetValues<
+                    UsedBookExchange.Domain.Enums.BookCondition>())
+                    {
+                        if (ViewBag.Condition != null &&
+                            (UsedBookExchange.Domain.Enums.BookCondition)
+                            ViewBag.Condition == item)
+                        {
+                            <option value="@item"
+                                    selected>
+                                @item
+                            </option>
+                        }
+                        else
+                        {
+                            <option value="@item">
+                                @item
+                            </option>
+                        }
+                    }
+
+                </select>
+
+            </div>
+
+
+            <!-- Search -->
+
+            <div class="col-lg-2 d-flex align-items-end">
+
+                <button type="submit"
+                        class="btn btn-primary w-100 search-button">
+
+                    Search
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </form>
+
+
+    @if (!string.IsNullOrWhiteSpace(
+        ViewBag.SearchTerm as string) ||
+        !string.IsNullOrWhiteSpace(
+        ViewBag.Category as string) ||
+        ViewBag.Condition != null)
+    {
+        <div class="active-filters">
+
+            <span>
+                Active filters:
+            </span>
+
+            <a asp-action="Index">
+                Clear all
+            </a>
 
         </div>
     }
 
 </div>
+
+
+<!-- =====================================================
+     RESULTS HEADER
+====================================================== -->
+
+<div class="results-header">
+
+    <div>
+
+        <span class="results-eyebrow">
+            BOOK COLLECTION
+        </span>
+
+        <h2>
+            @if (books.Count == 1)
+            {
+                @:1 book found
+            }
+            else
+            {
+                @:@books.Count books found
+            }
+        </h2>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     BOOKS
+====================================================== -->
+
+@if (!books.Any())
+{
+    <div class="empty-books">
+
+        <div class="empty-books-icon">
+            📚
+        </div>
+
+        <h3>
+            No books found
+        </h3>
+
+        <p>
+            We couldn't find any books matching
+            your search criteria.
+        </p>
+
+        <a asp-action="Index"
+           class="btn btn-outline-primary px-4">
+
+            Clear Filters
+
+        </a>
+
+    </div>
+}
+else
+{
+
+    <div class="row g-4">
+
+        @foreach (var book in books)
+        {
+            <div class="col-md-6 col-xl-4">
+
+                <article class="premium-book-card">
+
+
+                    <!-- BOOK IMAGE -->
+
+                    <div class="book-image-container">
+
+                        @if (!string.IsNullOrWhiteSpace(book.ImageUrl))
+                        {
+                            <img src="@book.ImageUrl"
+                                 alt="@book.Title"
+                                 loading="lazy" />
+                        }
+                        else
+                        {
+                            <div class="book-placeholder">
+
+                                <span>
+                                    📖
+                                </span>
+
+                                <small>
+                                    No cover available
+                                </small>
+
+                            </div>
+                        }
+
+
+                        <!-- STATUS -->
+
+                        <div class="book-status-overlay">
+
+                            @if (book.Status ==
+                                UsedBookExchange.Domain.Enums.BookStatus.Available)
+                            {
+                                <span class="premium-status available">
+                                    <span class="status-dot"></span>
+                                    Available
+                                </span>
+                            }
+                            else if (book.Status ==
+                                UsedBookExchange.Domain.Enums.BookStatus.Reserved)
+                            {
+                                <span class="premium-status reserved">
+                                    <span class="status-dot"></span>
+                                    Reserved
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="premium-status exchanged">
+                                    <span class="status-dot"></span>
+                                    Exchanged
+                                </span>
+                            }
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- CONTENT -->
+
+                    <div class="premium-book-content">
+
+                        <div class="book-category">
+                            @book.Category
+                        </div>
+
+
+                        <h3 class="premium-book-title">
+                            @book.Title
+                        </h3>
+
+
+                        <p class="premium-book-author">
+                            <span>by</span>
+                            @book.Author
+                        </p>
+
+
+                        <div class="book-meta">
+
+                            <div>
+
+                                <span>
+                                    Condition
+                                </span>
+
+                                <strong>
+                                    @book.Condition
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ACTIONS -->
+
+                    <div class="premium-book-actions">
+
+                        <a asp-action="Details"
+                           asp-route-id="@book.Id"
+                           class="btn btn-primary flex-grow-1">
+
+                            View Details
+
+                        </a>
+
+
+                        @if (User.Identity?.IsAuthenticated == true &&
+                             book.OwnerId == currentUserId &&
+                             book.Status ==
+                             UsedBookExchange.Domain.Enums.BookStatus.Available)
+                        {
+                            <a asp-action="Edit"
+                               asp-route-id="@book.Id"
+                               class="btn btn-outline-secondary">
+
+                                Edit
+
+                            </a>
+                        }
+
+                    </div>
+
+                </article>
+
+            </div>
+        }
+
+    </div>
+
+}
+
+</div>
+
+<style>
+
+    /* =====================================================
+       BOOKS HEADER
+    ====================================================== */
+
+    .books-header {
+        padding: 4.5rem 0 5rem;
+        margin-bottom: 0;
+        background:
+            radial-gradient(
+                circle at 85% 20%,
+                rgba(124, 92, 255, 0.18),
+                transparent 32%
+            ),
+            linear-gradient(
+                135deg,
+                #f7f7ff 0%,
+                #ffffff 55%,
+                #f4f3ff 100%
+            );
+        border-bottom: 1px solid #e9e9f1;
+    }
+
+    .books-eyebrow,
+    .results-eyebrow {
+        display: inline-block;
+        color: #5b5bd6;
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+    }
+
+    .books-title {
+        max-width: 760px;
+        margin: 0.6rem 0 1rem;
+        color: #171827;
+        font-size: clamp(2.2rem, 5vw, 3.6rem);
+        font-weight: 800;
+        letter-spacing: -1.5px;
+        line-height: 1.08;
+    }
+
+    .books-description {
+        max-width: 650px;
+        margin: 0;
+        color: #74768a;
+        font-size: 1.08rem;
+    }
+
+
+    /* =====================================================
+       STATISTICS
+    ====================================================== */
+
+    .books-statistics {
+        margin-top: -2rem;
+        position: relative;
+        z-index: 2;
+        margin-bottom: 3rem;
+    }
+
+    .stat-card {
+        min-height: 100px;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.25rem;
+        background: #ffffff;
+        border: 1px solid #e7e8f0;
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(30, 32, 55, 0.07);
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 13px;
+        font-size: 1.2rem;
+        font-weight: 800;
+    }
+
+    .stat-icon-primary {
+        color: #5b5bd6;
+        background: #eeeeff;
+    }
+
+    .stat-icon-success {
+        color: #18794e;
+        background: #e8f7ef;
+    }
+
+    .stat-icon-warning {
+        color: #936b00;
+        background: #fff4d6;
+    }
+
+    .stat-icon-dark {
+        color: #525767;
+        background: #edf0f4;
+    }
+
+    .stat-label {
+        display: block;
+        color: #74768a;
+        font-size: 0.78rem;
+        font-weight: 600;
+    }
+
+    .stat-value {
+        display: block;
+        margin-top: 2px;
+        color: #171827;
+        font-size: 1.35rem;
+        line-height: 1;
+    }
+
+
+    /* =====================================================
+       SEARCH
+    ====================================================== */
+
+    .professional-search {
+        padding: 1.7rem;
+        margin-bottom: 3.5rem;
+        background: #ffffff;
+        border: 1px solid #e7e8f0;
+        border-radius: 18px;
+        box-shadow: 0 8px 30px rgba(30, 32, 55, 0.05);
+    }
+
+    .search-heading {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .search-heading-icon {
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: #eeeeff;
+        font-size: 1.1rem;
+    }
+
+    .search-heading h5 {
+        margin: 0;
+        color: #171827;
+        font-weight: 750;
+    }
+
+    .search-heading p {
+        margin: 2px 0 0;
+        color: #74768a;
+        font-size: 0.9rem;
+    }
+
+    .professional-search label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #252638;
+        font-size: 0.85rem;
+        font-weight: 700;
+    }
+
+    .professional-search select,
+    .search-input-wrapper {
+        width: 100%;
+        height: 46px;
+        border: 1px solid #dfe1ea;
+        border-radius: 10px;
+        background: #ffffff;
+    }
+
+    .professional-search select {
+        padding: 0 0.8rem;
+        color: #252638;
+        outline: none;
+    }
+
+    .professional-search select:focus {
+        border-color: #5b5bd6;
+        box-shadow: 0 0 0 3px rgba(91, 91, 214, 0.1);
+    }
+
+    .search-input-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0 0.85rem;
+    }
+
+    .search-input-wrapper span {
+        opacity: 0.55;
+    }
+
+    .search-input-wrapper input {
+        width: 100%;
+        height: 100%;
+        border: none;
+        outline: none;
+        color: #252638;
+        background: transparent;
+    }
+
+    .search-button {
+        height: 46px;
+    }
+
+    .active-filters {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #eeeeF4;
+        color: #74768a;
+        font-size: 0.82rem;
+    }
+
+    .active-filters a {
+        color: #5b5bd6;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+
+    /* =====================================================
+       RESULTS
+    ====================================================== */
+
+    .results-header {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+    }
+
+    .results-header h2 {
+        margin: 0.3rem 0 0;
+        color: #171827;
+        font-size: 1.6rem;
+        font-weight: 750;
+    }
+
+
+    /* =====================================================
+       PREMIUM BOOK CARD
+    ====================================================== */
+
+    .premium-book-card {
+        height: 100%;
+        overflow: hidden;
+        background: #ffffff;
+        border: 1px solid #e7e8f0;
+        border-radius: 18px;
+        box-shadow: 0 5px 20px rgba(30, 32, 55, 0.05);
+        transition:
+            transform 0.25s ease,
+            box-shadow 0.25s ease;
+    }
+
+    .premium-book-card:hover {
+        transform: translateY(-7px);
+        box-shadow: 0 18px 42px rgba(30, 32, 55, 0.12);
+    }
+
+
+    /* IMAGE */
+
+    .book-image-container {
+        height: 310px;
+        position: relative;
+        overflow: hidden;
+        background: #eceef5;
+    }
+
+    .book-image-container img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+        transition: transform 0.45s ease;
+    }
+
+    .premium-book-card:hover
+    .book-image-container img {
+        transform: scale(1.035);
+    }
+
+    .book-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #8a8ca0;
+        background:
+            linear-gradient(
+                135deg,
+                #f1f2f7,
+                #e5e7ef
+            );
+    }
+
+    .book-placeholder span {
+        margin-bottom: 0.4rem;
+        font-size: 3.5rem;
+    }
+
+
+    /* STATUS */
+
+    .book-status-overlay {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+    }
+
+    .premium-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0.4rem 0.7rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(8px);
+        font-size: 0.72rem;
+        font-weight: 800;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .premium-status.available {
+        color: #18794e;
+    }
+
+    .premium-status.reserved {
+        color: #936b00;
+    }
+
+    .premium-status.exchanged {
+        color: #5c6270;
+    }
+
+    .status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+
+    /* CONTENT */
+
+    .premium-book-content {
+        padding: 1.35rem 1.4rem 1rem;
+    }
+
+    .book-category {
+        margin-bottom: 0.55rem;
+        color: #5b5bd6;
+        font-size: 0.73rem;
+        font-weight: 800;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+    }
+
+    .premium-book-title {
+        overflow: hidden;
+        margin: 0;
+        color: #171827;
+        font-size: 1.15rem;
+        font-weight: 750;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .premium-book-author {
+        margin: 0.25rem 0 1.15rem;
+        color: #74768a;
+        font-size: 0.9rem;
+    }
+
+    .premium-book-author span {
+        color: #a0a2b1;
+    }
+
+    .book-meta {
+        padding-top: 0.9rem;
+        border-top: 1px solid #eeeeF4;
+    }
+
+    .book-meta div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .book-meta span {
+        color: #8a8c9d;
+        font-size: 0.8rem;
+    }
+
+    .book-meta strong {
+        color: #252638;
+        font-size: 0.82rem;
+    }
+
+
+    /* ACTIONS */
+
+    .premium-book-actions {
+        display: flex;
+        gap: 0.6rem;
+        padding: 1rem 1.4rem 1.35rem;
+    }
+
+    .premium-book-actions .btn {
+        min-height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+
+    /* =====================================================
+       EMPTY STATE
+    ====================================================== */
+
+    .empty-books {
+        padding: 5rem 1.5rem;
+        text-align: center;
+        background: #ffffff;
+        border: 1px solid #e7e8f0;
+        border-radius: 18px;
+    }
+
+    .empty-books-icon {
+        width: 70px;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.2rem;
+        border-radius: 20px;
+        background: #eeeeff;
+        font-size: 2rem;
+    }
+
+    .empty-books h3 {
+        margin-bottom: 0.5rem;
+        color: #171827;
+    }
+
+    .empty-books p {
+        max-width: 430px;
+        margin: 0 auto 1.5rem;
+        color: #74768a;
+    }
+
+
+    /* =====================================================
+       RESPONSIVE
+    ====================================================== */
+
+    media (max-width: 767px) {
+
+        .books-header {
+            padding: 3rem 0 4rem;
+        }
+
+        .books-title {
+            font-size: 2.35rem;
+        }
+
+        .books-statistics {
+            margin-top: -1.5rem;
+        }
+
+        .professional-search {
+            padding: 1.2rem;
+        }
+
+        .book-image-container {
+            height: 280px;
+        }
+
+        .results-header h2 {
+            font-size: 1.35rem;
+        }
+
+    }
+
+</style>
