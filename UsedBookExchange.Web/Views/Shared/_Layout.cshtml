@@ -1,49 +1,283 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - UsedBookExchange.Web</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/UsedBookExchange.Web.styles.css" asp-append-version="true" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>
+        @ViewData["Title"] - UsedBookExchange.Web
+    </title>
+
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
+
+    <link rel="stylesheet"
+          href="~/UsedBookExchange.Web.styles.css"
+          asp-append-version="true" />
+
 </head>
+
 <body>
+
     <header>
+
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">UsedBookExchange.Web</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+
+                <!-- Application Name -->
+
+                <a class="navbar-brand"
+                   asp-area=""
+                   asp-controller="Home"
+                   asp-action="Index">
+                    UsedBookExchange.Web
+                </a>
+
+
+                <!-- Mobile Menu Button -->
+
+                <button class="navbar-toggler"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target=".navbar-collapse"
+                        aria-controls="navbarSupportedContent"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation">
+
                     <span class="navbar-toggler-icon"></span>
+
                 </button>
+
+
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+
+                    <!-- Main Navigation -->
+
                     <ul class="navbar-nav flex-grow-1">
+
+                        <!-- Home -->
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+
+                            <a class="nav-link text-dark"
+                               asp-area=""
+                               asp-controller="Home"
+                               asp-action="Index">
+                                Home
+                            </a>
+
                         </li>
+
+
+                        <!-- Books -->
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+
+                            <a class="nav-link text-dark"
+                               asp-area=""
+                               asp-controller="Books"
+                               asp-action="Index">
+                                Books
+                            </a>
+
                         </li>
+
+
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <!-- Add Book -->
+
+                            <li class="nav-item">
+
+                                <a class="nav-link text-dark"
+                                   asp-area=""
+                                   asp-controller="Books"
+                                   asp-action="Create">
+                                    Add Book
+                                </a>
+
+                            </li>
+
+
+                            <!-- My Requests -->
+
+                            <li class="nav-item">
+
+                                <a class="nav-link text-dark"
+                                   asp-area=""
+                                   asp-controller="Requests"
+                                   asp-action="MyRequests">
+                                    My Requests
+                                </a>
+
+                            </li>
+
+
+                            <!-- Received Requests -->
+
+                            <li class="nav-item">
+
+                                <a class="nav-link text-dark"
+                                   asp-area=""
+                                   asp-controller="Requests"
+                                   asp-action="ReceivedRequests">
+                                    Received Requests
+                                </a>
+
+                            </li>
+                        }
+
+
+                        <!-- Privacy -->
+
+                        <li class="nav-item">
+
+                            <a class="nav-link text-dark"
+                               asp-area=""
+                               asp-controller="Home"
+                               asp-action="Privacy">
+                                Privacy
+                            </a>
+
+                        </li>
+
                     </ul>
+
+
+                    <!-- Account Navigation -->
+
+                    <ul class="navbar-nav">
+
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <!-- Logged-in User -->
+
+                            <li class="nav-item">
+
+                                <span class="nav-link text-dark">
+                                    Hello, @User.Identity.Name
+                                </span>
+
+                            </li>
+
+
+                            <!-- Logout -->
+
+                            <li class="nav-item">
+
+                                <form asp-controller="Account"
+                                      asp-action="Logout"
+                                      method="post"
+                                      class="d-inline">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <button type="submit"
+                                            class="btn btn-link nav-link text-dark">
+                                        Logout
+                                    </button>
+
+                                </form>
+
+                            </li>
+                        }
+                        else
+                        {
+                            <!-- Login -->
+
+                            <li class="nav-item">
+
+                                <a class="nav-link text-dark"
+                                   asp-area=""
+                                   asp-controller="Account"
+                                   asp-action="Login">
+                                    Login
+                                </a>
+
+                            </li>
+
+
+                            <!-- Register -->
+
+                            <li class="nav-item">
+
+                                <a class="nav-link text-dark"
+                                   asp-area=""
+                                   asp-controller="Account"
+                                   asp-action="Register">
+                                    Register
+                                </a>
+
+                            </li>
+                        }
+
+                    </ul>
+
                 </div>
+
             </div>
+
         </nav>
+
     </header>
+
+
+    <!-- Main Content -->
+
     <div class="container">
-        <main role="main" class="pb-3">
+
+        <main role="main"
+              class="pb-3">
+
             @RenderBody()
+
         </main>
+
     </div>
 
+
+    <!-- Footer -->
+
     <footer class="border-top footer text-muted">
+
         <div class="container">
-            &copy; 2026 - UsedBookExchange.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+
+            &copy; 2026 - UsedBookExchange.Web -
+
+            <a asp-area=""
+               asp-controller="Home"
+               asp-action="Privacy">
+                Privacy
+            </a>
+
         </div>
+
     </footer>
+
+
+    <!-- Scripts -->
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+
+    <script src="~/js/site.js"
+            asp-append-version="true">
+    </script>
+
+    @await RenderSectionAsync(
+            "Scripts",
+            required: false)
+
 </body>
+
 </html>

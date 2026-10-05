@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UsedBookExchange.Domain.Entities;
+using UsedBookExchange.Domain.Enums;
 using UsedBookExchange.Infrastructure.Repositories.Interfaces;
 using UsedBookExchange.Web.ViewModels;
 
@@ -8,161 +9,223 @@ namespace UsedBookExchange.Web.Controllers;
 
 public class BooksController : Controller
 {
-	private readonly IBookRepository _bookRepository;
+    private readonly IBookRepository _bookRepository;
 
-	public BooksController(IBookRepository bookRepository)
-	{
-		_bookRepository = bookRepository;
-	}
+    public BooksController(IBookRepository bookRepository)
+    {
+        _bookRepository = bookRepository;
+    }
 
-	// GET: /Books
-	public async Task<IActionResult> Index()
-	{
-		var books = await _bookRepository.GetAllAsync();
+    // GET: /Books
+    public async Task<IActionResult> Index()
+    {
+        var books = await _bookRepository.GetAllAsync();
 
-		return View(books);
-	}
+        return View(books);
+    }
 
-	// GET: /Books/Details/5
-	public async Task<IActionResult> Details(int id)
-	{
-		var book = await _bookRepository.GetByIdAsync(id);
+    // GET: /Books/Details/5
+    public async Task<IActionResult> Details(int id)
+    {
+        var book = await _bookRepository.GetByIdAsync(id);
 
-		if (book == null)
-		{
-			return NotFound();
-		}
+        if (book == null)
+        {
+            return NotFound();
+        }
 
-		return View(book);
-	}
+        return View(book);
+    }
 
-	// GET: /Books/Create
-	[Authorize]
-	public IActionResult Create()
-	{
-		return View();
-	}
+    // GET: /Books/Create
+    [Authorize]
+    public IActionResult Create()
+    {
+        return View();
+    }
 
-	// POST: /Books/Create
-	[HttpPost]
-	[ValidateAntiForgeryToken]
-	[Authorize]
-	public async Task<IActionResult> Create(BookCreateViewModel model)
-	{
-		if (!ModelState.IsValid)
-		{
-			return View(model);
-		}
+    // POST: /Books/Create
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize]
+    public async Task<IActionResult> Create(BookCreateViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
 
-		var book = new Book
-		{
-			Title = model.Title,
-			Author = model.Author,
-			Description = model.Description,
-			Category = model.Category,
-			Condition = model.Condition,
-			ImageUrl = model.ImageUrl,
-			OwnerId = User.FindFirst(
-				System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
-				?? string.Empty
-		};
+        var currentUserId = User.FindFirst(
+            System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-		await _bookRepository.AddAsync(book);
+        if (string.IsNullOrEmpty(currentUserId))
+        {
+            return Unauthorized();
+        }
 
-		return RedirectToAction(nameof(Index));
-	}
+        var book = new Book
+        {
+            Title = model.Title,
+            Author = model.Author,
+            Description = model.Description,
+            Category = model.Category,
+            Condition = model.Condition,
+            ImageUrl = model.ImageUrl,
+            OwnerId = currentUserId
+        };
 
-	// GET: /Books/Edit/5
-	[Authorize]
-	public async Task<IActionResult> Edit(int id)
-	{
-		var book = await _bookRepository.GetByIdAsync(id);
+        await _bookRepository.AddAsync(book);
 
-		if (book == null)
-		{
-			return NotFound();
-		}
+        return RedirectToAction(nameof(Index));
+    }
 
-		var model = new BookEditViewModel
-		{
-			Id = book.Id,
-			Title = book.Title,
-			Author = book.Author,
-			Description = book.Description,
-			Category = book.Category,
-			Condition = book.Condition,
-			ImageUrl = book.ImageUrl
-		};
+    // GET: /Books/Edit/5
+    [Authorize]
+    public async Task<IActionResult> Edit(int id)
+    {
+        var book = await _bookRepository.GetByIdAsync(id);
 
-		return View(model);
-	}
+        if (book == null)
+        {
+            return NotFound();
+        }
 
-	// POST: /Books/Edit/5
-	[HttpPost]
-	[ValidateAntiForgeryToken]
-	[Authorize]
-	public async Task<IActionResult> Edit(
-		int id,
-		BookEditViewModel model)
-	{
-		if (id != model.Id)
-		{
-			return BadRequest();
-		}
+        var currentUserId = User.FindFirst(
+            System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-		if (!ModelState.IsValid)
-		{
-			return View(model);
-		}
+        if (book.OwnerId != currentUserId)
+        {
+            return Forbid();
+        }
 
-		var book = await _bookRepository.GetByIdAsync(id);
+        if (book.Status != BookStatus.Available)
+        {
+            return BadRequest(
+                "Only available books can be edited.");
+        }
 
-		if (book == null)
-		{
-			return NotFound();
-		}
+        var model = new BookEditViewModel
+        {
+            Id = book.Id,
+            Title = book.Title,
+            Author = book.Author,
+            Description = book.Description,
+            Category = book.Category,
+            Condition = book.Condition,
+            ImageUrl = book.ImageUrl
+        };
 
-		book.Title = model.Title;
-		book.Author = model.Author;
-		book.Description = model.Description;
-		book.Category = model.Category;
-		book.Condition = model.Condition;
-		book.ImageUrl = model.ImageUrl;
+        return View(model);
+    }
 
-		await _bookRepository.UpdateAsync(book);
+    // POST: /Books/Edit/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize]
+    public async Task<IActionResult> Edit(
+        int id,
+        BookEditViewModel model)
+    {
+        if (id != model.Id)
+        {
+            return BadRequest();
+        }
 
-		return RedirectToAction(nameof(Index));
-	}
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
 
-	// GET: /Books/Delete/5
-	[Authorize]
-	public async Task<IActionResult> Delete(int id)
-	{
-		var book = await _bookRepository.GetByIdAsync(id);
+        var book = await _bookRepository.GetByIdAsync(id);
 
-		if (book == null)
-		{
-			return NotFound();
-		}
+        if (book == null)
+        {
+            return NotFound();
+        }
 
-		return View(book);
-	}
+        var currentUserId = User.FindFirst(
+            System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-	// POST: /Books/Delete/5
-	[HttpPost, ActionName("Delete")]
-	[ValidateAntiForgeryToken]
-	[Authorize]
-	public async Task<IActionResult> DeleteConfirmed(int id)
-	{
-		var book = await _bookRepository.GetByIdAsync(id);
+        if (book.OwnerId != currentUserId)
+        {
+            return Forbid();
+        }
 
-		if (book == null)
-		{
-			return NotFound();
-		}
+        if (book.Status != BookStatus.Available)
+        {
+            return BadRequest(
+                "Only available books can be edited.");
+        }
 
-		await _bookRepository.DeleteAsync(book);
+        book.Title = model.Title;
+        book.Author = model.Author;
+        book.Description = model.Description;
+        book.Category = model.Category;
+        book.Condition = model.Condition;
+        book.ImageUrl = model.ImageUrl;
 
-		return RedirectToAction(nameof(Index));
-	}
+        await _bookRepository.UpdateAsync(book);
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    // GET: /Books/Delete/5
+    [Authorize]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var book = await _bookRepository.GetByIdAsync(id);
+
+        if (book == null)
+        {
+            return NotFound();
+        }
+
+        var currentUserId = User.FindFirst(
+            System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        if (book.OwnerId != currentUserId)
+        {
+            return Forbid();
+        }
+
+        if (book.Status != BookStatus.Available)
+        {
+            return BadRequest(
+                "Only available books can be deleted.");
+        }
+
+        return View(book);
+    }
+
+    // POST: /Books/Delete/5
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    [Authorize]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        var book = await _bookRepository.GetByIdAsync(id);
+
+        if (book == null)
+        {
+            return NotFound();
+        }
+
+        var currentUserId = User.FindFirst(
+            System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        if (book.OwnerId != currentUserId)
+        {
+            return Forbid();
+        }
+
+        if (book.Status != BookStatus.Available)
+        {
+            return BadRequest(
+                "Only available books can be deleted.");
+        }
+
+        await _bookRepository.DeleteAsync(book);
+
+        return RedirectToAction(nameof(Index));
+    }
 }

@@ -1,0 +1,122 @@
+﻿@model IEnumerable<UsedBookExchange.Domain.Entities.BookRequest>
+
+@{
+    ViewData["Title"] = "My Requests";
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h1>My Requests</h1>
+
+        <a asp-controller="Books"
+           asp-action="Index"
+           class="btn btn-primary">
+            Browse Books
+        </a>
+
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            You have not submitted any book requests yet.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+
+            @foreach (var request in Model)
+            {
+                <div class="col-md-6 mb-4">
+
+                    <div class="card shadow-sm h-100">
+
+                        <div class="card-body">
+
+                            <h5 class="card-title">
+                                @request.Book.Title
+                            </h5>
+
+                            <p class="card-text">
+                                <strong>Author:</strong>
+                                @request.Book.Author
+                            </p>
+
+                            <p class="card-text">
+                                <strong>Category:</strong>
+                                @request.Book.Category
+                            </p>
+
+                            <p class="card-text">
+                                <strong>Status:</strong>
+
+                                @if (request.Status == UsedBookExchange.Domain.Enums.RequestStatus.Pending)
+                                {
+                                    <span class="badge bg-warning text-dark">
+                                        Pending
+                                    </span>
+                                }
+                                else if (request.Status == UsedBookExchange.Domain.Enums.RequestStatus.Accepted)
+                                {
+                                    <span class="badge bg-success">
+                                        Accepted
+                                    </span>
+                                }
+                                else if (request.Status == UsedBookExchange.Domain.Enums.RequestStatus.Rejected)
+                                {
+                                    <span class="badge bg-danger">
+                                        Rejected
+                                    </span>
+                                }
+                                else if (request.Status == UsedBookExchange.Domain.Enums.RequestStatus.Completed)
+                                {
+                                    <span class="badge bg-primary">
+                                        Completed
+                                    </span>
+                                }
+
+                            </p>
+
+                            @if (!string.IsNullOrWhiteSpace(request.Message))
+                            {
+                                <p class="card-text">
+
+                                    <strong>Message:</strong>
+
+                                    <br />
+
+                                    @request.Message
+
+                                </p>
+                            }
+
+                            <p class="text-muted mb-0">
+                                Requested on:
+                                @request.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                            </p>
+
+                        </div>
+
+                        <div class="card-footer bg-white">
+
+                            <a asp-controller="Books"
+                               asp-action="Details"
+                               asp-route-id="@request.BookId"
+                               class="btn btn-outline-primary">
+                                View Book
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>

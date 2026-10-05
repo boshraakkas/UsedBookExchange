@@ -61,4 +61,16 @@ public class BookRequestRepository : IBookRequestRepository
 		_context.BookRequests.Update(request);
 		await _context.SaveChangesAsync();
 	}
+
+
+    public async Task<IEnumerable<BookRequest>> GetByOwnerIdAsync(
+    string ownerId)
+    {
+        return await _context.BookRequests
+            .AsNoTracking()
+            .Include(request => request.Book)
+            .Where(request => request.Book.OwnerId == ownerId)
+            .OrderByDescending(request => request.CreatedAt)
+            .ToListAsync();
+    }
 }
