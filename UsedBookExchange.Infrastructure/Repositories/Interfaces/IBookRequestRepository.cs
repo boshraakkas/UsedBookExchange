@@ -6,7 +6,7 @@ public interface IBookRequestRepository
 {
     Task<IEnumerable<BookRequest>> GetAllAsync();
 
-    Task<BookRequest?> GetByIdAsync(int id);
+Task<BookRequest?> GetByIdAsync(int id);
 
     Task<IEnumerable<BookRequest>> GetByBookIdAsync(int bookId);
 
@@ -19,4 +19,8 @@ public interface IBookRequestRepository
     Task AddAsync(BookRequest request);
 
     Task UpdateAsync(BookRequest request);
+
+    Task UpdateRangeAsync(
+        IEnumerable<BookRequest> requests);
+
 }

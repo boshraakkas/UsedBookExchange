@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UsedBookExchange.Domain.Entities;
 using UsedBookExchange.Domain.Enums;
@@ -11,16 +12,16 @@ public class BooksController : Controller
 {
     private readonly IBookRepository _bookRepository;
 
-    public BooksController(IBookRepository bookRepository)
+public BooksController(IBookRepository bookRepository)
     {
         _bookRepository = bookRepository;
     }
 
     // GET: /Books
     public async Task<IActionResult> Index(
-      string? searchTerm,
-      string? category,
-      BookCondition? condition)
+        string? searchTerm,
+        string? category,
+        BookCondition? condition)
     {
         var books = await _bookRepository.SearchAsync(
             searchTerm,
@@ -33,12 +34,6 @@ public class BooksController : Controller
 
         return View(books);
     }
-
-
-
-
-
-
 
     // GET: /Books/Details/5
     public async Task<IActionResult> Details(int id)
@@ -64,7 +59,8 @@ public class BooksController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize]
-    public async Task<IActionResult> Create(BookCreateViewModel model)
+    public async Task<IActionResult> Create(
+        BookCreateViewModel model)
     {
         if (!ModelState.IsValid)
         {
@@ -72,7 +68,7 @@ public class BooksController : Controller
         }
 
         var currentUserId = User.FindFirst(
-            System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            ClaimTypes.NameIdentifier)?.Value;
 
         if (string.IsNullOrEmpty(currentUserId))
         {
@@ -85,7 +81,7 @@ public class BooksController : Controller
             Author = model.Author,
             Description = model.Description,
             Category = model.Category,
-            Condition = model.Condition,
+            Condition = model.Condition.Value,
             ImageUrl = model.ImageUrl,
             OwnerId = currentUserId
         };
@@ -107,7 +103,12 @@ public class BooksController : Controller
         }
 
         var currentUserId = User.FindFirst(
-            System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(currentUserId))
+        {
+            return Unauthorized();
+        }
 
         if (book.OwnerId != currentUserId)
         {
@@ -160,7 +161,12 @@ public class BooksController : Controller
         }
 
         var currentUserId = User.FindFirst(
-            System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(currentUserId))
+        {
+            return Unauthorized();
+        }
 
         if (book.OwnerId != currentUserId)
         {
@@ -177,7 +183,7 @@ public class BooksController : Controller
         book.Author = model.Author;
         book.Description = model.Description;
         book.Category = model.Category;
-        book.Condition = model.Condition;
+        book.Condition = model.Condition.Value;
         book.ImageUrl = model.ImageUrl;
 
         await _bookRepository.UpdateAsync(book);
@@ -197,7 +203,12 @@ public class BooksController : Controller
         }
 
         var currentUserId = User.FindFirst(
-            System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(currentUserId))
+        {
+            return Unauthorized();
+        }
 
         if (book.OwnerId != currentUserId)
         {
@@ -227,7 +238,12 @@ public class BooksController : Controller
         }
 
         var currentUserId = User.FindFirst(
-            System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(currentUserId))
+        {
+            return Unauthorized();
+        }
 
         if (book.OwnerId != currentUserId)
         {
@@ -244,4 +260,6 @@ public class BooksController : Controller
 
         return RedirectToAction(nameof(Index));
     }
+
+
 }

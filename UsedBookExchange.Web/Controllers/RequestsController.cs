@@ -14,9 +14,9 @@ public class RequestsController : Controller
     private readonly IBookRequestRepository _requestRepository;
     private readonly IBookRepository _bookRepository;
 
-    public RequestsController(
-        IBookRequestRepository requestRepository,
-        IBookRepository bookRepository)
+public RequestsController(
+    IBookRequestRepository requestRepository,
+    IBookRepository bookRepository)
     {
         _requestRepository = requestRepository;
         _bookRepository = bookRepository;
@@ -41,7 +41,7 @@ public class RequestsController : Controller
             return Unauthorized();
         }
 
-        // User cannot request their own book.
+        // A user cannot request their own book.
         if (book.OwnerId == currentUserId)
         {
             return Forbid();
@@ -87,7 +87,7 @@ public class RequestsController : Controller
             return NotFound();
         }
 
-        // User cannot request their own book.
+        // A user cannot request their own book.
         if (book.OwnerId == currentUserId)
         {
             return Forbid();
@@ -103,14 +103,15 @@ public class RequestsController : Controller
             return View(model);
         }
 
-        // Prevent duplicate requests.
+        // Prevent duplicate pending requests.
         var existingRequests =
             await _requestRepository.GetByRequesterIdAsync(
                 currentUserId);
 
         var alreadyRequested = existingRequests.Any(
-            request => request.BookId == model.BookId &&
-                       request.Status == RequestStatus.Pending);
+            request =>
+                request.BookId == model.BookId &&
+                request.Status == RequestStatus.Pending);
 
         if (alreadyRequested)
         {
@@ -131,8 +132,7 @@ public class RequestsController : Controller
 
         await _requestRepository.AddAsync(request);
 
-        return RedirectToAction(
-            nameof(MyRequests));
+        return RedirectToAction(nameof(MyRequests));
     }
 
     // GET: /Requests/MyRequests
@@ -154,7 +154,6 @@ public class RequestsController : Controller
         return View(requests);
     }
 
-
     // GET: /Requests/ReceivedRequests
     [HttpGet]
     public async Task<IActionResult> ReceivedRequests()
@@ -173,9 +172,6 @@ public class RequestsController : Controller
 
         return View(requests);
     }
-
-
-
 
     // POST: /Requests/Accept/5
     [HttpPost]
@@ -217,32 +213,41 @@ public class RequestsController : Controller
                 "This book is no longer available.");
         }
 
-        // Accept this request.
+        // Accept the selected request.
         request.Status = RequestStatus.Accepted;
 
         // Reserve the book.
         request.Book.Status = BookStatus.Reserved;
 
-        // Reject all other pending requests for this book.
+        // Reject all other pending requests.
         var otherRequests =
             await _requestRepository.GetByBookIdAsync(
                 request.BookId);
 
-        foreach (var otherRequest in otherRequests)
-        {
-            if (otherRequest.Id != request.Id &&
+        var pendingOtherRequests = otherRequests
+            .Where(otherRequest =>
+                otherRequest.Id != request.Id &&
                 otherRequest.Status == RequestStatus.Pending)
-            {
-                otherRequest.Status = RequestStatus.Rejected;
-            }
+            .ToList();
+
+        foreach (var otherRequest in pendingOtherRequests)
+        {
+            otherRequest.Status = RequestStatus.Rejected;
         }
 
+        // Save the accepted request and reserved book.
         await _requestRepository.UpdateAsync(request);
+
+        // Save the other rejected requests.
+        if (pendingOtherRequests.Count > 0)
+        {
+            await _requestRepository.UpdateRangeAsync(
+                pendingOtherRequests);
+        }
 
         return RedirectToAction(
             nameof(ReceivedRequests));
     }
-
 
     // POST: /Requests/Reject/5
     [HttpPost]
@@ -285,6 +290,56 @@ public class RequestsController : Controller
             nameof(ReceivedRequests));
     }
 
+    // POST: /Requests/Complete/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Complete(int id)
+    {
+        var currentUserId = User.FindFirst(
+            ClaimTypes.NameIdentifier)?.Value;
 
+        if (string.IsNullOrEmpty(currentUserId))
+        {
+            return Unauthorized();
+        }
+
+        var request = await _requestRepository.GetByIdAsync(id);
+
+        if (request == null)
+        {
+            return NotFound();
+        }
+
+        // Only the book owner can complete the exchange.
+        if (request.Book.OwnerId != currentUserId)
+        {
+            return Forbid();
+        }
+
+        // Only accepted requests can be completed.
+        if (request.Status != RequestStatus.Accepted)
+        {
+            return BadRequest(
+                "Only accepted requests can be completed.");
+        }
+
+        // The book must be reserved.
+        if (request.Book.Status != BookStatus.Reserved)
+        {
+            return BadRequest(
+                "This book is not reserved.");
+        }
+
+        // Complete the request.
+        request.Status = RequestStatus.Completed;
+
+        // Mark the book as exchanged.
+        request.Book.Status = BookStatus.Exchanged;
+
+        await _requestRepository.UpdateAsync(request);
+
+        return RedirectToAction(
+            nameof(ReceivedRequests));
+    }
 
 }

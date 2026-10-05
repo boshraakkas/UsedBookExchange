@@ -73,4 +73,15 @@ public class BookRequestRepository : IBookRequestRepository
             .OrderByDescending(request => request.CreatedAt)
             .ToListAsync();
     }
+
+
+
+
+    public async Task UpdateRangeAsync(
+        IEnumerable<BookRequest> requests)
+    {
+        _context.BookRequests.UpdateRange(requests);
+
+        await _context.SaveChangesAsync();
+    }
 }

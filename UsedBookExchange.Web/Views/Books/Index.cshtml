@@ -3,12 +3,16 @@
 @{
     ViewData["Title"] = "Books";
 
-    var categories = Model
-        .Select(book => book.Category)
-        .Where(category => !string.IsNullOrWhiteSpace(category))
-        .Distinct()
-        .OrderBy(category => category)
-        .ToList();
+var categories = Model
+    .Select(book => book.Category)
+    .Where(category => !string.IsNullOrWhiteSpace(category))
+    .Distinct()
+    .OrderBy(category => category)
+    .ToList();
+
+    var currentUserId = User.FindFirst(
+        System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
 }
 
 <div class="container mt-4">
@@ -146,7 +150,7 @@
                     </div>
 
 
-                    <!-- Buttons -->
+                    <!-- Search Button -->
 
                     <div class="col-md-1 d-flex align-items-end">
 
@@ -194,6 +198,7 @@
 
                     <div class="card h-100 shadow-sm">
 
+                        <!-- Book Image -->
                         @if (!string.IsNullOrEmpty(book.ImageUrl))
                         {
                             <img src="@book.ImageUrl"
@@ -205,25 +210,38 @@
 
                         <div class="card-body">
 
+                            <!-- Title -->
+
                             <h5 class="card-title">
                                 @book.Title
                             </h5>
+
+
+                            <!-- Author -->
 
                             <p class="card-text">
                                 <strong>Author:</strong>
                                 @book.Author
                             </p>
 
+
+                            <!-- Category -->
+
                             <p class="card-text">
                                 <strong>Category:</strong>
                                 @book.Category
                             </p>
+
+
+                            <!-- Condition -->
 
                             <p class="card-text">
                                 <strong>Condition:</strong>
                                 @book.Condition
                             </p>
 
+
+                            <!-- Status -->
 
                             <p class="card-text">
 
@@ -255,13 +273,31 @@
                         </div>
 
 
+                        <!-- Card Footer -->
+
                         <div class="card-footer bg-white">
+
+                            <!-- Details -->
 
                             <a asp-action="Details"
                                asp-route-id="@book.Id"
                                class="btn btn-outline-primary">
                                 Details
                             </a>
+
+
+                            <!-- Edit - Owner Only -->
+                            @if (User.Identity?.IsAuthenticated == true &&
+                           book.OwnerId == currentUserId &&
+                           book.Status ==
+                           UsedBookExchange.Domain.Enums.BookStatus.Available)
+                            {
+                                <a asp-action="Edit"
+                                   asp-route-id="@book.Id"
+                                   class="btn btn-outline-warning ms-2">
+                                    Edit
+                                </a>
+                            }
 
                         </div>
 
