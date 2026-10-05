@@ -1,0 +1,660 @@
+﻿@model UsedBookExchange.Web.ViewModels.AdminDashboardViewModel
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="admin-layout">
+
+    
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+
+        <div class="admin-brand">
+            <div class="admin-brand-icon">B</div>
+
+            <div>
+                <strong>BookExchange</strong>
+                <span>Administration</span>
+            </div>
+        </div>
+
+        <nav class="admin-nav">
+
+            <a href="#dashboard"
+               class="admin-nav-link active"
+               data-section="dashboard">
+                <span class="admin-nav-icon">D</span>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="#users"
+               class="admin-nav-link"
+               data-section="users">
+                <span class="admin-nav-icon">U</span>
+                <span>Users</span>
+            </a>
+
+            <a href="#books"
+               class="admin-nav-link"
+               data-section="books">
+                <span class="admin-nav-icon">B</span>
+                <span>Books</span>
+            </a>
+
+            <a href="#requests"
+               class="admin-nav-link"
+               data-section="requests">
+                <span class="admin-nav-icon">R</span>
+                <span>Requests</span>
+            </a>
+
+        </nav>
+
+        <div class="admin-sidebar-bottom">
+
+            <a asp-controller="Home"
+               asp-action="Index"
+               class="admin-nav-link">
+                <span class="admin-nav-icon">W</span>
+                <span>Back to Website</span>
+            </a>
+
+            <form asp-controller="Account"
+                  asp-action="Logout"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <button type="submit"
+                        class="admin-nav-link admin-logout">
+                    <span class="admin-nav-icon">L</span>
+                    <span>Logout</span>
+                </button>
+
+            </form>
+
+        </div>
+
+    </aside>
+
+
+    <!-- Main Content -->
+    <main class="admin-main">
+
+        <!-- Top Header -->
+        <header class="admin-topbar">
+
+            <div>
+                <span class="admin-eyebrow">
+                    ADMINISTRATION
+                </span>
+
+                <h1 class="admin-page-title">
+                    Dashboard
+                </h1>
+            </div>
+
+            <div class="admin-user">
+                <div class="admin-user-avatar">
+                    @User.Identity?.Name?.Substring(0, 1).ToUpper()
+                </div>
+
+                <div>
+                    <strong>Administrator</strong>
+                    <span>Admin</span>
+                </div>
+            </div>
+
+        </header>
+
+
+        <!-- Dashboard Section -->
+        <section id="dashboard"
+                 class="admin-section active-section">
+
+            <div class="admin-section-heading">
+                <div>
+                    <h2>Overview</h2>
+                    <p>Monitor the current activity of the platform.</p>
+                </div>
+            </div>
+
+
+            <!-- Statistics -->
+            <div class="admin-stats-grid">
+
+                <div class="admin-stat-card">
+                    <span class="admin-stat-icon">U</span>
+
+                    <div>
+                        <span class="admin-stat-label">
+                            Total Users
+                        </span>
+
+                        <strong class="admin-stat-value">
+                            @Model.TotalUsers
+                        </strong>
+                    </div>
+                </div>
+
+
+                <div class="admin-stat-card">
+                    <span class="admin-stat-icon">B</span>
+
+                    <div>
+                        <span class="admin-stat-label">
+                            Total Books
+                        </span>
+
+                        <strong class="admin-stat-value">
+                            @Model.TotalBooks
+                        </strong>
+                    </div>
+                </div>
+
+
+                <div class="admin-stat-card">
+                    <span class="admin-stat-icon">A</span>
+
+                    <div>
+                        <span class="admin-stat-label">
+                            Available Books
+                        </span>
+
+                        <strong class="admin-stat-value">
+                            @Model.AvailableBooks
+                        </strong>
+                    </div>
+                </div>
+
+
+                <div class="admin-stat-card">
+                    <span class="admin-stat-icon">R</span>
+
+                    <div>
+                        <span class="admin-stat-label">
+                            Reserved Books
+                        </span>
+
+                        <strong class="admin-stat-value">
+                            @Model.ReservedBooks
+                        </strong>
+                    </div>
+                </div>
+
+
+                <div class="admin-stat-card">
+                    <span class="admin-stat-icon">E</span>
+
+                    <div>
+                        <span class="admin-stat-label">
+                            Exchanged Books
+                        </span>
+
+                        <strong class="admin-stat-value">
+                            @Model.ExchangedBooks
+                        </strong>
+                    </div>
+                </div>
+
+
+                <div class="admin-stat-card">
+                    <span class="admin-stat-icon">P</span>
+
+                    <div>
+                        <span class="admin-stat-label">
+                            Pending Requests
+                        </span>
+
+                        <strong class="admin-stat-value">
+                            @Model.PendingRequests
+                        </strong>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- Quick Management -->
+            <div class="admin-panel">
+
+                <div class="admin-panel-header">
+                    <div>
+                        <h3>Quick Management</h3>
+                        <p>Access the main platform management sections.</p>
+                    </div>
+                </div>
+
+                <div class="admin-quick-grid">
+
+                    <button type="button"
+                            class="admin-quick-card"
+                            data-target="users">
+
+                        <span class="quick-icon">U</span>
+
+                        <strong>Manage Users</strong>
+
+                        <small>
+                            View and manage platform users.
+                        </small>
+
+                    </button>
+
+
+                    <button type="button"
+                            class="admin-quick-card"
+                            data-target="books">
+
+                        <span class="quick-icon">B</span>
+
+                        <strong>Manage Books</strong>
+
+                        <small>
+                            Review and manage book listings.
+                        </small>
+
+                    </button>
+
+
+                    <button type="button"
+                            class="admin-quick-card"
+                            data-target="requests">
+
+                        <span class="quick-icon">R</span>
+
+                        <strong>Manage Requests</strong>
+
+                        <small>
+                            Monitor exchange requests.
+                        </small>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section id="users" class="admin-section">
+            <div class="admin-section-heading">
+                <div>
+                    <span class="admin-eyebrow">MANAGEMENT</span>
+
+                    <h2>Users</h2>
+
+                    <p>
+                        View registered users and their activity.
+                    </p>
+                </div>
+            </div>
+
+            <div class="admin-panel">
+
+                <div class="admin-panel-header">
+                    <div>
+                        <h3>Registered Users</h3>
+
+                        <p>
+                            @Model.Users.Count user(s) registered on the platform.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="admin-table-wrapper">
+
+                    <table class="admin-table">
+
+                        <thead>
+                            <tr>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Books</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @if (Model.Users.Any())
+                            {
+                                foreach (var user in Model.Users)
+                                {
+                                    <tr>
+
+                                        <td>
+                                            <strong>
+                                                @user.FullName
+                                            </strong>
+                                        </td>
+
+                                        <td>
+                                            @user.Email
+                                        </td>
+
+                                        <td>
+                                            <span class="admin-badge">
+                                                @user.Role
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            @user.BooksCount
+                                        </td>
+
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="4">
+                                        No users found.
+                                    </td>
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- Books Section -->
+        <section id="books" class="admin-section">
+            <div class="admin-section-heading">
+                <div>
+                    <span class="admin-eyebrow">MANAGEMENT</span>
+
+                    <h2>Books</h2>
+
+                    <p>
+                        View all books listed on the platform.
+                    </p>
+                </div>
+            </div>
+
+            <div class="admin-panel">
+
+                <div class="admin-panel-header">
+                    <div>
+                        <h3>Book Listings</h3>
+
+                        <p>
+                            @Model.Books.Count book(s) listed on the platform.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="admin-table-wrapper">
+
+                    <table class="admin-table">
+
+                        <thead>
+                            <tr>
+                                <th>Book</th>
+                                <th>Author</th>
+                                <th>Owner</th>
+                                <th>Condition</th>
+                                <th>Status</th>
+                                <th>Added</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @if (Model.Books.Any())
+                            {
+                                foreach (var book in Model.Books)
+                                {
+                                    <tr>
+
+                                        <td>
+                                            <div class="admin-book-cell">
+
+                                                @if (!string.IsNullOrWhiteSpace(book.ImageUrl))
+                                                {
+                                                    <img src="@book.ImageUrl"
+                                                         alt="@book.Title"
+                                                         class="admin-book-image" />
+                                                }
+                                                else
+                                                {
+                                                    <div class="admin-book-placeholder">
+                                                        B
+                                                    </div>
+                                                }
+
+                                                <strong>
+                                                    @book.Title
+                                                </strong>
+
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            @book.Author
+                                        </td>
+
+                                        <td>
+                                            @book.OwnerName
+                                        </td>
+
+                                        <td>
+                                            @book.Condition
+                                        </td>
+
+                                        <td>
+                                            <span class="admin-badge">
+                                                @book.Status
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            @book.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy")
+                                        </td>
+
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="6">
+                                        No books found.
+                                    </td>
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- Requests Section -->
+        <section id="requests" class="admin-section">
+
+            <div class="admin-section-heading">
+                <div>
+                    <span class="admin-eyebrow">MANAGEMENT</span>
+
+                    <h2>Requests</h2>
+
+                    <p>
+                        Monitor book exchange requests across the platform.
+                    </p>
+                </div>
+            </div>
+
+            <div class="admin-panel">
+
+                <div class="admin-panel-header">
+                    <div>
+                        <h3>Exchange Requests</h3>
+
+                        <p>
+                            @Model.Requests.Count request(s) submitted.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="admin-table-wrapper">
+
+                    <table class="admin-table">
+
+                        <thead>
+                            <tr>
+                                <th>Book</th>
+                                <th>Requester</th>
+                                <th>Status</th>
+                                <th>Requested At</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @if (Model.Requests.Any())
+                            {
+                                foreach (var request in Model.Requests)
+                                {
+                                    <tr>
+
+                                        <td>
+                                            <strong>
+                                                @request.BookTitle
+                                            </strong>
+                                        </td>
+
+                                        <td>
+                                            @request.RequesterName
+                                        </td>
+
+                                        <td>
+                                            <span class="admin-badge">
+                                                @request.Status
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            @request.CreatedAt
+                                            .ToLocalTime()
+                                            .ToString("MMM dd, yyyy HH:mm")
+                                        </td>
+
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="4">
+                                        No requests found.
+                                    </td>
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+            
+        </section>
+
+    </main>
+    
+
+</div>
+
+@section Scripts {
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const navLinks =
+                document.querySelectorAll(".admin-nav-link[data-section]");
+
+            const sections =
+                document.querySelectorAll(".admin-section");
+
+            const quickCards =
+                document.querySelectorAll(".admin-quick-card");
+
+
+            function showSection(sectionId) {
+
+                sections.forEach(section => {
+                    section.classList.remove("active-section");
+                });
+
+                const target =
+                    document.getElementById(sectionId);
+
+                if (target) {
+                    target.classList.add("active-section");
+                }
+
+
+                navLinks.forEach(link => {
+
+                    link.classList.remove("active");
+
+                    if (link.dataset.section === sectionId) {
+                        link.classList.add("active");
+                    }
+
+                });
+
+
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth"
+                });
+            }
+
+
+            navLinks.forEach(link => {
+
+                link.addEventListener("click", function (event) {
+
+                    event.preventDefault();
+
+                    showSection(this.dataset.section);
+
+                });
+
+            });
+
+
+            quickCards.forEach(card => {
+
+                card.addEventListener("click", function () {
+
+                    showSection(this.dataset.target);
+
+                });
+
+            });
+
+        });
+
+    </script>
+
+}

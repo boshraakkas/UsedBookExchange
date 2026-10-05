@@ -6,6 +6,7 @@ using UsedBookExchange.Infrastructure.Repositories;
 using UsedBookExchange.Infrastructure.Repositories.Interfaces;
 using UsedBookExchange.Web.Services;
 using UsedBookExchange.Web.Services.Interfaces;
+using UsedBookExchange.Infrastructure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,12 +31,19 @@ options.User.RequireUniqueEmail = true;
 .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<IBookRepository, BookRepository>();
+builder.Services.AddScoped<   IAdminDashboardRepository,AdminDashboardRepository>();
 builder.Services.AddScoped<IBookRequestRepository, BookRequestRepository>();
 builder.Services.AddScoped<IImageService, ImageService>();
 
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    await IdentitySeeder.SeedAsync(
+        scope.ServiceProvider,
+        app.Configuration);
+}
 
 if (!app.Environment.IsDevelopment())
 {
